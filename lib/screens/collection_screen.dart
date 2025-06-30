@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/museum.dart';
 import '../models/artifact.dart';
 import 'task_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
+  final Museum museum;
+  
+  const CollectionScreen({
+    Key? key,
+    required this.museum,
+  }) : super(key: key);
+
   @override
-  _CollectionScreenState createState() => _CollectionScreenState();
+  State<CollectionScreen> createState() => _CollectionScreenState();
 }
 
 class _CollectionScreenState extends State<CollectionScreen> {
-  List<Artifact> artifacts = List.generate(
-    8,
-    (index) => Artifact(name: 'Артефакт ${index + 1}'),
-  );
-
   @override
   void initState() {
     super.initState();
@@ -22,39 +25,41 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Future<void> _loadArtifactStates() async {
     final prefs = await SharedPreferences.getInstance();
-    for (int i = 0; i < artifacts.length; i++) {
-      bool found = prefs.getBool('artifact_$i') ?? false;
-      artifacts[i].found = found;
+    for (var artifact in widget.museum.artifacts) {
+      bool found = prefs.getBool('${widget.museum.id}_${artifact.id}') ?? false;
+      artifact.found = found;
     }
     setState(() {});
   }
 
-  Future<void> _saveArtifactState(int index, bool found) async {
+  Future<void> _saveArtifactState(Artifact artifact, bool found) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('artifact_$index', found);
+    await prefs.setBool('${widget.museum.id}_${artifact.id}', found);
   }
 
   void markAsFound(int index) {
     setState(() {
-      artifacts[index].found = true;
+      widget.museum.artifacts[index].found = true;
     });
-    _saveArtifactState(index, true);
+    _saveArtifactState(widget.museum.artifacts[index], true);
 
-    if (artifacts.every((a) => a.found)) {
-      Future.delayed(Duration(milliseconds: 500), () {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('Поздравляем!'),
-            content: Text('Вы нашли все артефакты и раскрыли Сырную Тайну!'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              )
-            ],
-          ),
-        );
+    if (widget.museum.artifacts.every((a) => a.found)) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+              title: Text('Поздравляем!'),
+              content: Text('Вы выполнили все задания квеста!'),
+              actions: [
+                TextButton(
+                  onPressed: null,
+                  child: Text('OK'),
+                )
+              ],
+            ),
+          );
+        }
       });
     }
   }
@@ -62,24 +67,27 @@ class _CollectionScreenState extends State<CollectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Костромская коллекция')),
+      appBar: AppBar(title: Text('Квест: ${widget.museum.name}')),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: GridView.builder(
-          itemCount: artifacts.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          itemCount: widget.museum.artifacts.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
           ),
           itemBuilder: (context, index) {
-            final artifact = artifacts[index];
+            final artifact = widget.museum.artifacts[index];
             return GestureDetector(
               onTap: () async {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => TaskScreen(artifactName: artifact.name),
+                    builder: (_) => TaskScreen(
+                      artifactName: artifact.name,
+                      artifactDescription: artifact.description,
+                    ),
                   ),
                 );
                 if (result == true) markAsFound(index);
@@ -90,13 +98,24 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Text(
-                    artifact.found ? artifact.name : '???',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: artifact.found ? Colors.black : Colors.white,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        artifact.found ? Icons.check_circle : Icons.help_outline,
+                        size: 40,
+                        color: artifact.found ? Colors.green : Colors.white,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        artifact.found ? artifact.name : 'Задание ${index + 1}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: artifact.found ? Colors.black : Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
