@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/artifact.dart';
 import 'task_screen.dart';
 
@@ -8,13 +9,36 @@ class CollectionScreen extends StatefulWidget {
 }
 
 class _CollectionScreenState extends State<CollectionScreen> {
-  List<Artifact> artifacts = List.generate(8, (index) =>
-    Artifact(name: 'Артефакт ${index + 1}'));
+  List<Artifact> artifacts = List.generate(
+    8,
+    (index) => Artifact(name: 'Артефакт ${index + 1}'),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _loadArtifactStates();
+  }
+
+  Future<void> _loadArtifactStates() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (int i = 0; i < artifacts.length; i++) {
+      bool found = prefs.getBool('artifact_$i') ?? false;
+      artifacts[i].found = found;
+    }
+    setState(() {});
+  }
+
+  Future<void> _saveArtifactState(int index, bool found) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('artifact_$index', found);
+  }
 
   void markAsFound(int index) {
     setState(() {
       artifacts[index].found = true;
     });
+    _saveArtifactState(index, true);
 
     if (artifacts.every((a) => a.found)) {
       Future.delayed(Duration(milliseconds: 500), () {
@@ -43,8 +67,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
         padding: const EdgeInsets.all(12),
         child: GridView.builder(
           itemCount: artifacts.length,
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
           itemBuilder: (context, index) {
             final artifact = artifacts[index];
             return GestureDetector(
@@ -52,9 +79,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => TaskScreen(
-                      artifactName: artifact.name,
-                    ),
+                    builder: (_) => TaskScreen(artifactName: artifact.name),
                   ),
                 );
                 if (result == true) markAsFound(index);
