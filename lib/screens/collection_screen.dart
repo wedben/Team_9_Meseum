@@ -70,57 +70,84 @@ class _CollectionScreenState extends State<CollectionScreen> {
       appBar: AppBar(title: Text('Квест: ${widget.museum.name}')),
       body: Padding(
         padding: const EdgeInsets.all(12),
-        child: GridView.builder(
-          itemCount: widget.museum.artifacts.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-          ),
-          itemBuilder: (context, index) {
-            final artifact = widget.museum.artifacts[index];
-            return GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TaskScreen(
-                      artifactName: artifact.name,
-                      artifactDescription: artifact.description,
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('История музея'),
+                    content: SingleChildScrollView(
+                      child: Text(widget.museum.history),
                     ),
-                  ),
-                );
-                if (result == true) markAsFound(index);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: artifact.found ? Colors.amber : Colors.grey[400],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        artifact.found ? Icons.check_circle : Icons.help_outline,
-                        size: 40,
-                        color: artifact.found ? Colors.green : Colors.white,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        artifact.found ? artifact.name : 'Задание ${index + 1}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: artifact.found ? Colors.black : Colors.white,
-                        ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Закрыть'),
                       ),
                     ],
                   ),
+                );
+              },
+              child: const Text('Показать историю музея'),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: GridView.builder(
+                itemCount: widget.museum.artifacts.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
                 ),
+                itemBuilder: (context, index) {
+                  final artifact = widget.museum.artifacts[index];
+                  return GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TaskScreen(
+                            artifactName: artifact.name,
+                            artifactDescription: artifact.description,
+                          ),
+                        ),
+                      );
+                      if (result == true) markAsFound(index);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: artifact.found ? Colors.amber : Colors.grey[400],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              artifact.found ? Icons.check_circle : Icons.help_outline,
+                              size: 40,
+                              color: artifact.found ? Colors.green : Colors.white,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              artifact.found ? artifact.name : 'Задание ${index + 1}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: artifact.found ? Colors.black : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );

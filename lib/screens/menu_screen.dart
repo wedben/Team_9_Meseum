@@ -3,8 +3,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/museum.dart';
 import '../models/artifact.dart';
+import '../data/museum_quests.dart';
+import '../data/museum_stories.dart';
+
+import 'collection_screen.dart';
 import 'museum_history_screen.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -19,102 +24,56 @@ class _MenuScreenState extends State<MenuScreen> {
   late final MapController _mapController;
   Position? _currentPosition;
 
-  final List<Museum> _museums = [
-    Museum(
-      id: 'cheese',
-      name: 'Музей Сыра',
-      location: const LatLng(57.762517, 40.930541),
-      description: 'Узнайте всё о сыре и его истории.',
-      history: 'История про сырного алхимика Пантелея...',
-      artifacts: [
-        Artifact(
-          id: 'cheese_1',
-          name: 'Самый старый сырный пресс',
-          description: 'Определи его вес по маркировке',
-        ),
-        Artifact(
-          id: 'cheese_2',
-          name: 'Пазл-этикетка',
-          description: 'Восстанови старинную упаковку костромского сыра',
-        ),
-        Artifact(
-          id: 'cheese_3',
-          name: 'Секретный ингредиент',
-          description: 'Отыщи необычную добавку в сыр среди экспонатов',
-        ),
-        Artifact(
-          id: 'cheese_4',
-          name: 'Определи сорт сыра',
-          description: 'В дегустационной зоне угадай 1 из 3 предложенных сыров',
-        ),
-      ],
-    ),
-    Museum(
-      id: 'nature',
-      name: 'Музей природы',
-      location: const LatLng(57.765759, 40.924066),
-      description: 'Погрузитесь в природу и её разнообразие.',
-      history: 'История про профессора Вертинского и Код Природы...',
-      artifacts: [
-        Artifact(
-          id: 'nature_1',
-          name: 'Самый крупный экспонат',
-          description: 'Измерь его размеры (можно сравнить с ростомером)',
-        ),
-        Artifact(
-          id: 'nature_2',
-          name: 'Цепь питания',
-          description: 'Разложи карточки с животными в правильном порядке',
-        ),
-        Artifact(
-          id: 'nature_3',
-          name: 'Определи птицу по голосу',
-          description: 'Прослушай аудиозапись и найди соответствующее чучело',
-        ),
-        Artifact(
-          id: 'nature_4',
-          name: 'Краснокнижный экспонат',
-          description: 'Отметь на карте Костромской области, где он обитает',
-        ),
-      ],
-    ),
-    Museum(
-      id: 'military',
-      name: 'Гауптвахта',
-      location: const LatLng(57.768799, 40.926776),
-      description: 'Откройте для себя военную историю региона.',
-      history: 'История про караульного Коробицына...',
-      artifacts: [
-        Artifact(
-          id: 'military_1',
-          name: 'Самое старое оружие',
-          description: 'Запиши его тип и год изготовления',
-        ),
-        Artifact(
-          id: 'military_2',
-          name: 'Шифр донесения',
-          description: 'Расшифруй простое сообщение (например, заменой букв)',
-        ),
-        Artifact(
-          id: 'military_3',
-          name: 'Нарушитель устава',
-          description: 'По описанию найдите, за что могли арестовать солдата',
-        ),
-        Artifact(
-          id: 'military_4',
-          name: 'Караульный график',
-          description: 'По количеству солдат распредели смены за сутки',
-        ),
-      ],
-    ),
-  ];
+  final List<Museum> _museums = [];
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
     _getCurrentLocation();
+    _initMuseums();
     _loadArtifactsState();
+  }
+
+  void _initMuseums() {
+    _museums.addAll([
+      Museum(
+        id: 'cheese',
+        name: 'Музей Сыра',
+        location: const LatLng(57.762517, 40.930541),
+        description: 'Узнайте всё о сыре и его истории.',
+        history: MuseumStories.cheeseMuseumHistory,
+        artifacts: MuseumQuests.cheeseMuseumQuests.map((q) => Artifact(
+          id: q['id']!,
+          name: q['name']!,
+          description: q['description']!,
+        )).toList(),
+      ),
+      Museum(
+        id: 'nature',
+        name: 'Музей природы',
+        location: const LatLng(57.765759, 40.924066),
+        description: 'Погрузитесь в природу и её разнообразие.',
+        history: MuseumStories.natureMuseumHistory,
+        artifacts: MuseumQuests.natureMuseumQuests.map((q) => Artifact(
+          id: q['id']!,
+          name: q['name']!,
+          description: q['description']!,
+        )).toList(),
+      ),
+      Museum(
+        id: 'military',
+        name: 'Гауптвахта',
+        location: const LatLng(57.768799, 40.926776),
+        description: 'Откройте для себя военную историю региона.',
+        history: MuseumStories.guardMuseumHistory,
+        artifacts: MuseumQuests.guardMuseumQuests.map((q) => Artifact(
+          id: q['id']!,
+          name: q['name']!,
+          description: q['description']!,
+        )).toList(),
+      ),
+    ]);
   }
 
   Future<void> _loadArtifactsState() async {
@@ -149,6 +108,32 @@ class _MenuScreenState extends State<MenuScreen> {
     return true;
   }
 
+  Future<void> _onMuseumTap(Museum museum) async {
+    final prefs = await SharedPreferences.getInstance();
+    final visited = prefs.getBool('visited_${museum.id}') ?? false;
+
+    if (!visited) {
+      await prefs.setBool('visited_${museum.id}', true);
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => MuseumHistoryScreen(museum: museum),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => CollectionScreen(museum: museum),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,14 +156,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 width: 40,
                 height: 40,
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MuseumHistoryScreen(museum: museum),
-                      ),
-                    );
-                  },
+                  onTap: () => _onMuseumTap(museum),
                   child: const Icon(Icons.location_on, color: Colors.red, size: 40),
                 ),
               );
