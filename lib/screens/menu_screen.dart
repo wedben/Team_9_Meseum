@@ -11,6 +11,9 @@ import '../data/museum_stories.dart';
 
 import 'collection_screen.dart';
 import 'museum_history_screen.dart';
+import 'photo_quest_screen.dart';
+import 'text_input_quest_screen.dart';
+import 'qr_quest_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({Key? key}) : super(key: key);
@@ -44,9 +47,11 @@ class _MenuScreenState extends State<MenuScreen> {
         description: 'Узнайте всё о сыре и его истории.',
         history: MuseumStories.cheeseMuseumHistory,
         artifacts: MuseumQuests.cheeseMuseumQuests.map((q) => Artifact(
-          id: q['id']!,
-          name: q['name']!,
-          description: q['description']!,
+          id: q['id'] ?? '',
+          name: q['name'] ?? '',
+          description: q['description'] ?? '',
+          type: q['type'] ?? '',
+          answer: q['answer'] ?? '',
         )).toList(),
       ),
       Museum(
@@ -56,9 +61,11 @@ class _MenuScreenState extends State<MenuScreen> {
         description: 'Погрузитесь в природу и её разнообразие.',
         history: MuseumStories.natureMuseumHistory,
         artifacts: MuseumQuests.natureMuseumQuests.map((q) => Artifact(
-          id: q['id']!,
-          name: q['name']!,
-          description: q['description']!,
+          id: q['id'] ?? '',
+          name: q['name'] ?? '',
+          description: q['description'] ?? '',
+          type: q['type'] ?? '',
+          answer: q['answer'] ?? '',
         )).toList(),
       ),
       Museum(
@@ -68,9 +75,11 @@ class _MenuScreenState extends State<MenuScreen> {
         description: 'Откройте для себя военную историю региона.',
         history: MuseumStories.guardMuseumHistory,
         artifacts: MuseumQuests.guardMuseumQuests.map((q) => Artifact(
-          id: q['id']!,
-          name: q['name']!,
-          description: q['description']!,
+          id: q['id'] ?? '',
+          name: q['name'] ?? '',
+          description: q['description'] ?? '',
+          type: q['type'] ?? '',
+          answer: q['answer'] ?? '',
         )).toList(),
       ),
     ]);
@@ -114,24 +123,15 @@ class _MenuScreenState extends State<MenuScreen> {
 
     if (!visited) {
       await prefs.setBool('visited_${museum.id}', true);
-      Navigator.push(
+      await Navigator.push(
         context,
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => MuseumHistoryScreen(museum: museum),
-          transitionsBuilder: (_, animation, __, child) =>
-              FadeTransition(opacity: animation, child: child),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => CollectionScreen(museum: museum),
-          transitionsBuilder: (_, animation, __, child) =>
-              FadeTransition(opacity: animation, child: child),
-        ),
+        MaterialPageRoute(builder: (_) => MuseumHistoryScreen(museum: museum)),
       );
     }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CollectionScreen(museum: museum)),
+    );
   }
 
   @override

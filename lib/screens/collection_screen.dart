@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/museum.dart';
 import '../models/artifact.dart';
 import 'task_screen.dart';
+import 'photo_quest_screen.dart';
+import 'text_input_quest_screen.dart';
+import 'qr_quest_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Museum museum;
@@ -67,87 +70,109 @@ class _CollectionScreenState extends State<CollectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Квест: ${widget.museum.name}')),
+      appBar: AppBar(
+        title: Text('Квест: ${widget.museum.name}'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.info_outline),
+            tooltip: 'История музея',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('История музея'),
+                  content: SingleChildScrollView(
+                    child: Text(widget.museum.history),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Закрыть'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('История музея'),
-                    content: SingleChildScrollView(
-                      child: Text(widget.museum.history),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Закрыть'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              child: const Text('Показать историю музея'),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: GridView.builder(
-                itemCount: widget.museum.artifacts.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                ),
-                itemBuilder: (context, index) {
-                  final artifact = widget.museum.artifacts[index];
-                  return GestureDetector(
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TaskScreen(
-                            artifactName: artifact.name,
-                            artifactDescription: artifact.description,
-                          ),
-                        ),
-                      );
-                      if (result == true) markAsFound(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: artifact.found ? Colors.amber : Colors.grey[400],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              artifact.found ? Icons.check_circle : Icons.help_outline,
-                              size: 40,
-                              color: artifact.found ? Colors.green : Colors.white,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              artifact.found ? artifact.name : 'Задание ${index + 1}',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: artifact.found ? Colors.black : Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+        child: GridView.builder(
+          itemCount: widget.museum.artifacts.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
+          itemBuilder: (context, index) {
+            final artifact = widget.museum.artifacts[index];
+            final type = artifact.type;
+            final answer = artifact.answer;
+            return GestureDetector(
+              onTap: () async {
+                dynamic result;
+                if (type == 'photo') {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PhotoQuestScreen(
+                        targetLabel: answer,
+                        description: artifact.description,
+                        hint: artifact.description,
                       ),
                     ),
                   );
-                },
+                } else if (type == 'text') {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TextInputQuestScreen(
+                        question: artifact.description,
+                        correctAnswer: answer,
+                      ),
+                    ),
+                  );
+                } else if (type == 'qr') {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => QrQuestScreen(description: artifact.description),
+                    ),
+                  );
+                } else {
+                  // Для музеев без типа квеста — просто показываем описание
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TaskScreen(
+                        artifactName: artifact.name,
+                        artifactDescription: artifact.description,
+                        description: artifact.description,
+                      ),
+                    ),
+                  );
+                }
+                if (result == true) markAsFound(index);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: artifact.found ? Colors.amber : Colors.grey[400],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    artifact.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: artifact.found ? Colors.black : Colors.white,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
