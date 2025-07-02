@@ -55,7 +55,7 @@ class MuseumQuests {
     {
       'id': 'nature_4',
       'name': 'Косолапый экспонат',
-      'description': 'Найди бурого медведя и отсканируй QR-код рядом с ним',
+      'description': 'Найди бурого медведя и сфотографируй его',
       'type': 'photo',
       'answer': 'bear',
     },
