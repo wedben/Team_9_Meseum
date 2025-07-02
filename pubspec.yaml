@@ -9,15 +9,35 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # Карты и геолокация
   flutter_map: ^6.1.0
   latlong2: ^0.9.0
-  geolocator: ^10.1.0
+  geolocator: ^9.0.0
+  
+  # UI
   cupertino_icons: ^1.0.6
+  
+  # Хранение данных
   shared_preferences: ^2.2.2
+  
+  # Компьютерное зрение
   google_mlkit_image_labeling: ^0.14.1
-  image_picker: ^1.0.7
   google_mlkit_barcode_scanning: ^0.14.0
   
+  # Работа с изображениями
+  image_picker: ^1.0.7
+  
+  # AR
+  vector_math: ^2.1.4
+  arkit_plugin: ^1.1.2
+  arcore_flutter_plugin: ^0.1.0
+  
+  # Дополнительные рекомендуемые пакеты
+  path_provider: ^2.0.11  # Для работы с путями файлов
+  path: ^1.8.2            # Для манипуляций с путями
+  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -28,3 +48,8 @@ flutter:
 
   assets:
     - assets/images/sled.png
+    - assets/models/mammoth.glb
+    - assets/models/mammoth.dae
+    - assets/models/Image_0.png
+    - assets/models/roughness mammoth.png
+    - assets/models/tomatos/pepperbell_red2fbx.usdz

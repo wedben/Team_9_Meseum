@@ -55,7 +55,7 @@ class _MenuScreenState extends State<MenuScreen> {
         )).toList(),
       ),
       Museum(
-        id: 'nature',
+        id: 'nature_museum',
         name: 'Музей природы',
         location: const LatLng(57.765759, 40.924066),
         description: 'Погрузитесь в природу и её разнообразие.',

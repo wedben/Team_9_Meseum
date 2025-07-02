@@ -6,10 +6,13 @@ import 'task_screen.dart';
 import 'photo_quest_screen.dart';
 import 'text_input_quest_screen.dart';
 import 'qr_quest_screen.dart';
+import 'dart:io' show Platform;
+import 'ar_reward_ios_screen.dart';
+import 'ar_reward_android_screen.dart';
 
 class CollectionScreen extends StatefulWidget {
   final Museum museum;
-  
+
   const CollectionScreen({
     Key? key,
     required this.museum,
@@ -20,6 +23,8 @@ class CollectionScreen extends StatefulWidget {
 }
 
 class _CollectionScreenState extends State<CollectionScreen> {
+  bool allTasksCompleted = false;
+
   @override
   void initState() {
     super.initState();
@@ -28,11 +33,17 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Future<void> _loadArtifactStates() async {
     final prefs = await SharedPreferences.getInstance();
+    bool allFound = true;
+
     for (var artifact in widget.museum.artifacts) {
       bool found = prefs.getBool('${widget.museum.id}_${artifact.id}') ?? false;
       artifact.found = found;
+      if (!found) allFound = false;
     }
-    setState(() {});
+
+    setState(() {
+      allTasksCompleted = allFound;
+    });
   }
 
   Future<void> _saveArtifactState(Artifact artifact, bool found) async {
@@ -47,6 +58,10 @@ class _CollectionScreenState extends State<CollectionScreen> {
     _saveArtifactState(widget.museum.artifacts[index], true);
 
     if (widget.museum.artifacts.every((a) => a.found)) {
+      setState(() {
+        allTasksCompleted = true;
+      });
+
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           showDialog(
@@ -67,8 +82,18 @@ class _CollectionScreenState extends State<CollectionScreen> {
     }
   }
 
+  void _openRewardThankYouScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const RewardThankYouScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final showRewardTile = widget.museum.id == 'nature_museum' && allTasksCompleted;
+    final itemCount = widget.museum.artifacts.length + (showRewardTile ? 1 : 0);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Квест: ${widget.museum.name}'),
@@ -116,7 +141,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   artifact.found = false;
                 }
                 await prefs.remove('visited_${widget.museum.id}');
-                setState(() {});
+                setState(() {
+                  allTasksCompleted = false;
+                });
               }
             },
           ),
@@ -125,16 +152,35 @@ class _CollectionScreenState extends State<CollectionScreen> {
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: GridView.builder(
-          itemCount: widget.museum.artifacts.length,
+          itemCount: itemCount,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
           ),
           itemBuilder: (context, index) {
+            if (showRewardTile && index == itemCount - 1) {
+              return GestureDetector(
+                onTap: _openRewardThankYouScreen,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Забрать награду',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              );
+            }
             final artifact = widget.museum.artifacts[index];
             final type = artifact.type;
             final answer = artifact.answer;
+
             return GestureDetector(
               onTap: () async {
                 dynamic result;
@@ -167,7 +213,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     ),
                   );
                 } else {
-                  // Для музеев без типа квеста — просто показываем описание
                   result = await Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -179,6 +224,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     ),
                   );
                 }
+
                 if (result == true) markAsFound(index);
               },
               child: Container(
@@ -199,6 +245,52 @@ class _CollectionScreenState extends State<CollectionScreen> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class RewardThankYouScreen extends StatelessWidget {
+  const RewardThankYouScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Поздравляем!')),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'Спасибо за прохождение нашего квеста!\nВы отлично справились!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 40),
+            ElevatedButton.icon(
+              onPressed: () {
+                if (Platform.isIOS) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ARRewardIosScreen()),
+                  );
+                } else if (Platform.isAndroid) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ARRewardAndroidScreen()),
+                  );
+                }
+              },
+              icon: const Icon(Icons.card_giftcard),
+              label: const Text('Забрать награду'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+              ),
+            ),
+          ],
         ),
       ),
     );
