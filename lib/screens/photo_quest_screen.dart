@@ -74,6 +74,10 @@ class _PhotoQuestScreenState extends State<PhotoQuestScreen> {
           _result = 'Поздравляем! На фото найден: медведь';
         } else if (found) {
           _result = 'Поздравляем! На фото найден: ${widget.targetLabel}';
+        } else if (widget.targetLabel == 'cat') {
+          _result = 'На фото не найдена рысь. Попробуйте ещё раз.';
+        } else if (widget.targetLabel == 'bear') {
+          _result = 'На фото не найден медведь. Попробуйте ещё раз.';
         } else {
           _result = 'На фото не найден ${widget.targetLabel}. Попробуйте ещё раз.';
         }

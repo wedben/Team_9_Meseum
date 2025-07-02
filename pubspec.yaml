@@ -31,12 +31,18 @@ dependencies:
   # AR
   vector_math: ^2.1.4
   arkit_plugin: ^1.1.2
-  arcore_flutter_plugin: ^0.1.0
   
   # Дополнительные рекомендуемые пакеты
   path_provider: ^2.0.11  # Для работы с путями файлов
   path: ^1.8.2            # Для манипуляций с путями
   
+  # Model Viewer Plus
+  model_viewer_plus: ^1.9.3
+  
+  # Permission Handler
+  permission_handler: ^11.0.0
+
+
 
 dev_dependencies:
   flutter_test:
@@ -52,4 +58,5 @@ flutter:
     - assets/models/mammoth.dae
     - assets/models/Image_0.png
     - assets/models/roughness mammoth.png
-    - assets/models/tomatos/pepperbell_red2fbx.usdz
+    - assets/models/mammoth.obj
+

@@ -66,14 +66,14 @@ class _CollectionScreenState extends State<CollectionScreen> {
         if (mounted) {
           showDialog(
             context: context,
-            builder: (_) => const AlertDialog(
+            builder: (context) => AlertDialog(
               title: Text('Поздравляем!'),
               content: Text('Вы выполнили все задания квеста!'),
               actions: [
                 TextButton(
-                  onPressed: null,
-                  child: Text('OK'),
-                )
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('ОК'),
+                ),
               ],
             ),
           );
