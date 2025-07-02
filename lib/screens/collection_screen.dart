@@ -94,6 +94,32 @@ class _CollectionScreenState extends State<CollectionScreen> {
               );
             },
           ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            tooltip: 'Сбросить прогресс',
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('Сбросить прогресс?'),
+                  content: Text('Вы уверены, что хотите сбросить прогресс по всем квестам этого музея?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Отмена')),
+                    TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Сбросить')),
+                  ],
+                ),
+              );
+              if (confirmed == true) {
+                final prefs = await SharedPreferences.getInstance();
+                for (var artifact in widget.museum.artifacts) {
+                  await prefs.remove('${widget.museum.id}_${artifact.id}');
+                  artifact.found = false;
+                }
+                await prefs.remove('visited_${widget.museum.id}');
+                setState(() {});
+              }
+            },
+          ),
         ],
       ),
       body: Padding(

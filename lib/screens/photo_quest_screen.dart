@@ -36,21 +36,47 @@ class _PhotoQuestScreenState extends State<PhotoQuestScreen> {
     });
 
     try {
-      final inputImage = InputImage.fromFilePath(_image!.path);
-      final imageLabeler = ImageLabeler(
-        options: ImageLabelerOptions(confidenceThreshold: 0.5),
-      );
-      final labels = await imageLabeler.processImage(inputImage);
-      imageLabeler.close();
-
-      final found = labels.any((label) =>
-        label.label.toLowerCase().contains(widget.targetLabel.toLowerCase())
-      );
+      bool found = false;
+      if (widget.targetLabel == 'bear') {
+        // Только если среди меток есть ровно 'bear'
+        final inputImage = InputImage.fromFilePath(_image!.path);
+        final imageLabeler = ImageLabeler(
+          options: ImageLabelerOptions(confidenceThreshold: 0.5),
+        );
+        final labels = await imageLabeler.processImage(inputImage);
+        imageLabeler.close();
+        found = labels.any((label) => label.label.toLowerCase() == 'bear');
+      } else if (widget.targetLabel == 'cat') {
+        // Только если среди меток есть ровно 'cat'
+        final inputImage = InputImage.fromFilePath(_image!.path);
+        final imageLabeler = ImageLabeler(
+          options: ImageLabelerOptions(confidenceThreshold: 0.5),
+        );
+        final labels = await imageLabeler.processImage(inputImage);
+        imageLabeler.close();
+        found = labels.any((label) => label.label.toLowerCase() == 'cat');
+      } else {
+        final inputImage = InputImage.fromFilePath(_image!.path);
+        final imageLabeler = ImageLabeler(
+          options: ImageLabelerOptions(confidenceThreshold: 0.5),
+        );
+        final labels = await imageLabeler.processImage(inputImage);
+        imageLabeler.close();
+        found = labels.any((label) =>
+          label.label.toLowerCase().contains(widget.targetLabel.toLowerCase())
+        );
+      }
 
       setState(() {
-        _result = found
-            ? 'Поздравляем! На фото найден: ${widget.targetLabel}'
-            : 'На фото не найден ${widget.targetLabel}. Попробуйте ещё раз.';
+        if (found && widget.targetLabel == 'cat') {
+          _result = 'Поздравляем! На фото найдена: рысь';
+        } else if (found && widget.targetLabel == 'bear') {
+          _result = 'Поздравляем! На фото найден: медведь';
+        } else if (found) {
+          _result = 'Поздравляем! На фото найден: ${widget.targetLabel}';
+        } else {
+          _result = 'На фото не найден ${widget.targetLabel}. Попробуйте ещё раз.';
+        }
         _isLoading = false;
       });
 
@@ -69,7 +95,7 @@ class _PhotoQuestScreenState extends State<PhotoQuestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Фото-квест: ${widget.targetLabel}')),
+      appBar: AppBar(title: const Text('Фото-квест')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
