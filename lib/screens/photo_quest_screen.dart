@@ -40,7 +40,6 @@ class _PhotoQuestScreenState extends State<PhotoQuestScreen> {
     try {
       bool found = false;
       if (widget.targetLabel == 'bear') {
-        // Только если среди меток есть ровно 'bear'
         final inputImage = InputImage.fromFilePath(_image!.path);
         final imageLabeler = ImageLabeler(
           options: ImageLabelerOptions(confidenceThreshold: 0.5),
@@ -49,7 +48,6 @@ class _PhotoQuestScreenState extends State<PhotoQuestScreen> {
         imageLabeler.close();
         found = labels.any((label) => label.label.toLowerCase() == 'bear');
       } else if (widget.targetLabel == 'cat') {
-        // Только если среди меток есть ровно 'cat'
         final inputImage = InputImage.fromFilePath(_image!.path);
         final imageLabeler = ImageLabeler(
           options: ImageLabelerOptions(confidenceThreshold: 0.5),
