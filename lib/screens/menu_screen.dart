@@ -137,7 +137,20 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Карта музеев')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/icon.png',
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
+            ),
+            SizedBox(width: 8),
+            Text('Карта музеев'),
+          ],
+        ),
+      ),
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(

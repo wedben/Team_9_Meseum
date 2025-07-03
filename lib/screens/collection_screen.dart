@@ -27,23 +27,29 @@ class _CollectionScreenState extends State<CollectionScreen> {
   bool allTasksCompleted = false;
   final Map<String, int> _artifactFrames = {};
   final Set<int> _usedFrames = {};
+  final Map<String, int> _artifactDoFrames = {};
+  final Set<int> _usedDoFrames = {};
 
   @override
   void initState() {
     super.initState();
-    _loadArtifactStates();
+    _loadArtifactStates().then((_) {
+      _assignDoFramesIfNeeded();
+      setState(() {});
+    });
   }
 
   Future<void> _loadArtifactStates() async {
     final prefs = await SharedPreferences.getInstance();
     bool allFound = true;
     _usedFrames.clear();
+    _usedDoFrames.clear();
 
     for (var artifact in widget.museum.artifacts) {
       bool found = prefs.getBool('${widget.museum.id}_${artifact.id}') ?? false;
       artifact.found = found;
       if (!found) allFound = false;
-      // Загружаем индекс рамки для природы
+      // Загружаем индекс рамки для выполненных квестов природы
       if (widget.museum.id == 'nature_museum') {
         int? frameIdx = prefs.getInt('nature_museum_${artifact.id}_frame');
         if (frameIdx != null) {
@@ -61,22 +67,42 @@ class _CollectionScreenState extends State<CollectionScreen> {
   Future<void> _saveArtifactState(Artifact artifact, bool found) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('${widget.museum.id}_${artifact.id}', found);
-    // Если это природа и квест только что выполнен, сохраняем индекс рамки по равномерному принципу
+    // Для выполненных квестов природы — распределение рамки
     if (widget.museum.id == 'nature_museum' && found && !_artifactFrames.containsKey(artifact.id)) {
       int idx;
       if (_usedFrames.length < 3) {
-        // Выбираем только из невыданных
         final all = [0, 1, 2];
         final unused = all.where((i) => !_usedFrames.contains(i)).toList();
         idx = (unused..shuffle()).first;
       } else {
-        // Все рамки уже были, сбрасываем
         _usedFrames.clear();
         idx = Random().nextInt(3);
       }
       await prefs.setInt('nature_museum_${artifact.id}_frame', idx);
       _artifactFrames[artifact.id] = idx;
       _usedFrames.add(idx);
+    }
+  }
+
+  void _assignDoFramesIfNeeded() {
+    if (widget.museum.id != 'nature_museum') return;
+    _usedDoFrames.clear();
+    _artifactDoFrames.clear();
+    
+    for (var artifact in widget.museum.artifacts) {
+      if (!artifact.found) {
+        int idx;
+        if (_usedDoFrames.length < 3) {
+          final all = [0, 1, 2];
+          final unused = all.where((i) => !_usedDoFrames.contains(i)).toList();
+          idx = (unused..shuffle()).first;
+        } else {
+          _usedDoFrames.clear();
+          idx = Random().nextInt(3);
+        }
+        _artifactDoFrames[artifact.id] = idx;
+        _usedDoFrames.add(idx);
+      }
     }
   }
 
@@ -176,7 +202,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   if (widget.museum.id == 'nature_museum') {
                     await prefs.remove('nature_museum_${artifact.id}_frame');
                     _artifactFrames.remove(artifact.id);
-                    // После сброса прогресса сбрасываем и _usedFrames
                     _usedFrames.clear();
                   }
                 }
@@ -269,7 +294,6 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                 if (widget.museum.id == 'nature_museum') {
                                   await prefs.remove('nature_museum_${artifact.id}_frame');
                                   _artifactFrames.remove(artifact.id);
-                                  // После сброса прогресса сбрасываем и _usedFrames
                                   _usedFrames.clear();
                                 }
                               }
@@ -298,18 +322,35 @@ class _CollectionScreenState extends State<CollectionScreen> {
                       if (showRewardTile && index == itemCount - 1) {
                         return GestureDetector(
                           onTap: _openRewardThankYouScreen,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Забрать награду',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/sprite/ramk_Shapk/ramk_after_reward.png',
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                                height: double.infinity,
                               ),
-                            ),
+                              const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Text(
+                                  'Забрать награду',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                        blurRadius: 4,
+                                        color: Colors.black12,
+                                        offset: Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       }
@@ -380,7 +421,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                             'assets/sprite/ramk_Shapk/ramk_after2.png',
                                             'assets/sprite/ramk_Shapk/ramk_after3.png',
                                           ][_artifactFrames[artifact.id] ?? 0]
-                                        : 'assets/sprite/ramk_Shapk/ramk_do.png',
+                                        : [
+                                            'assets/sprite/ramk_Shapk/ramk_do1.png',
+                                            'assets/sprite/ramk_Shapk/ramk_do2.png',
+                                            'assets/sprite/ramk_Shapk/ramk_do3.png',
+                                          ][_artifactDoFrames[artifact.id] ?? 0],
                                     fit: BoxFit.contain,
                                     width: double.infinity,
                                     height: double.infinity,

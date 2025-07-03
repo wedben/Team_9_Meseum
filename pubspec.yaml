@@ -48,12 +48,20 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/sled.png
+    - assets/images/icon.png
     - assets/models/mammoth.glb
     - assets/models/mammoth.dae
     - assets/models/Image_0.png
@@ -62,7 +70,10 @@ flutter:
     - assets/sprite/nature/natur_marker.png
     - assets/sprite/cheese/cheese_marker.png
     - assets/sprite/guard/guard_marker.png
-    - assets/sprite/ramk_Shapk/ramk_do.png
+    - assets/sprite/ramk_Shapk/ramk_do1.png
+    - assets/sprite/ramk_Shapk/ramk_do2.png
+    - assets/sprite/ramk_Shapk/ramk_do3.png
+    - assets/sprite/ramk_Shapk/ramk_after_reward.png
     - assets/sprite/ramk_Shapk/ramk_after1.png
     - assets/sprite/ramk_Shapk/ramk_after2.png
     - assets/sprite/ramk_Shapk/ramk_after3.png

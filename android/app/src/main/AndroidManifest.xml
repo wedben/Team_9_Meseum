@@ -4,9 +4,9 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
         
-        android:label="team_9_museum"
+        android:label="Museum Quest"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
