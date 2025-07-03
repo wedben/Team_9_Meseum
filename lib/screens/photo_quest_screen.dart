@@ -7,12 +7,14 @@ class PhotoQuestScreen extends StatefulWidget {
   final String targetLabel;
   final String description;
   final String hint;
+  final String? museumId;
 
   const PhotoQuestScreen({
     Key? key,
     required this.targetLabel,
     required this.description,
     required this.hint,
+    this.museumId,
   }) : super(key: key);
 
   @override
@@ -98,46 +100,94 @@ class _PhotoQuestScreenState extends State<PhotoQuestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isNature = widget.museumId == 'nature_museum';
     return Scaffold(
-      appBar: AppBar(title: const Text('Фото-квест')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Text(widget.description, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 8),
-            if (widget.targetLabel == 'wolf')
-              Center(
-                child: Image.asset(
-                  'assets/images/sled.png',
-                  height: 180,
-                  fit: BoxFit.contain,
+      appBar: isNature ? null : AppBar(title: const Text('Фото-квест')),
+      body: Stack(
+        children: [
+          if (isNature)
+            Image.asset(
+              'assets/sprite/ramk_Shapk/shapk.png',
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+            ),
+          Column(
+            children: [
+              if (isNature)
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Colors.black),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Colors.black, width: 2),
+                              ),
+                              child: const Text(
+                                'Фото-квест',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 48),
+                      ],
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(widget.description, style: const TextStyle(fontSize: 16)),
+                      const SizedBox(height: 8),
+                      if (widget.targetLabel == 'wolf')
+                        Center(
+                          child: Image.asset(
+                            'assets/images/sled.png',
+                            height: 180,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      if (widget.targetLabel != 'wolf')
+                        Text('Подсказка: ${widget.hint}', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                      const SizedBox(height: 16),
+                      if (_image != null)
+                        Image.file(_image!, height: 250, fit: BoxFit.contain),
+                      if (_result != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Text(_result!, style: const TextStyle(fontSize: 18)),
+                        ),
+                      if (_isLoading) const CircularProgressIndicator(),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.camera),
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Сделать фото'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.gallery),
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Выбрать из галереи'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            if (widget.targetLabel != 'wolf')
-              Text('Подсказка: ${widget.hint}', style: const TextStyle(fontSize: 14, color: Colors.grey)),
-            const SizedBox(height: 16),
-            if (_image != null)
-              Image.file(_image!, height: 250, fit: BoxFit.contain),
-            if (_result != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Text(_result!, style: const TextStyle(fontSize: 18)),
-              ),
-            if (_isLoading) const CircularProgressIndicator(),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => _pickImage(ImageSource.camera),
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Сделать фото'),
-            ),
-            ElevatedButton.icon(
-              onPressed: () => _pickImage(ImageSource.gallery),
-              icon: const Icon(Icons.photo_library),
-              label: const Text('Выбрать из галереи'),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

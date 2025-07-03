@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AR Мамонт</title>
+    <!-- Подключаем AR.js и A-Frame -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        /* Стиль для загрузочного экрана */
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <!-- Загрузчик (показывается до запуска AR) -->
+    <div class="arjs-loader">
+        <div>Двигайте камерой, чтобы обнаружить поверхности. Нажмите на экран, чтобы разместить мамонта.</div>
+    </div>
+    
+    <!-- Основная AR-сцена -->
+    <a-scene 
+        vr-mode-ui="enabled: false" 
+        embedded 
+        arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+    >
+        <!-- Камера -->
+        <a-camera gps-camera rotation-reader></a-camera>
+        
+        <!-- 3D-модель мамонта (изначально скрыта) -->
+        <a-entity 
+            id="mammoth" 
+            gltf-model="assets/mammoth.glb" 
+            scale="0.5 0.5 0.5" 
+            visible="false"
+            class="clickable"
+        ></a-entity>
+        
+        <!-- Курсор для выбора места -->
+        <a-entity 
+            id="cursor" 
+            cursor="rayOrigin: mouse" 
+            raycaster="objects: .clickable" 
+            position="0 0 -1" 
+            geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" 
+            material="color: gold; shader: flat"
+        ></a-entity>
+    </a-scene>
+
+    <script>
+        // Получаем элементы сцены
+        const scene = document.querySelector('a-scene');
+        const mammoth = document.querySelector('#mammoth');
+        const cursor = document.querySelector('#cursor');
+        
+        // При клике размещаем модель
+        scene.addEventListener('click', (evt) => {
+            if (!mammoth.getAttribute('visible')) {
+                // Устанавливаем модель в позицию курсора
+                const position = cursor.getAttribute('position');
+                mammoth.setAttribute('position', position);
+                mammoth.setAttribute('visible', 'true');
+                
+                // Скрываем курсор после размещения
+                cursor.setAttribute('visible', 'false');
+                
+                // Скрываем загрузчик
+                document.querySelector('.arjs-loader').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

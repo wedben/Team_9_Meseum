@@ -157,7 +157,37 @@ class _MenuScreenState extends State<MenuScreen> {
                 height: 40,
                 child: GestureDetector(
                   onTap: () => _onMuseumTap(museum),
-                  child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                  child: museum.id == 'nature_museum'
+                      ? Transform.scale(
+                          scale: 1.0, // подбери коэффициент для каждого маркера
+                          child: Image.asset(
+                            'assets/sprite/nature/natur_marker.png',
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.contain,
+                          ),
+                        )
+                      : museum.id == 'cheese'
+                          ? Transform.scale(
+                              scale: 4,
+                              child: Image.asset(
+                                'assets/sprite/cheese/cheese_marker.png',
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : museum.id == 'military'
+                              ? Transform.scale(
+                                  scale: 2.5,
+                                  child: Image.asset(
+                                    'assets/sprite/guard/guard_marker.png',
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.contain,
+                                  ),
+                                )
+                              : const Icon(Icons.location_on, color: Colors.red, size: 40),
                 ),
               );
             }).toList(),

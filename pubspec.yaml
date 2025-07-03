@@ -59,4 +59,11 @@ flutter:
     - assets/models/Image_0.png
     - assets/models/roughness mammoth.png
     - assets/models/mammoth.obj
-
+    - assets/sprite/nature/natur_marker.png
+    - assets/sprite/cheese/cheese_marker.png
+    - assets/sprite/guard/guard_marker.png
+    - assets/sprite/ramk_Shapk/ramk_do.png
+    - assets/sprite/ramk_Shapk/ramk_after1.png
+    - assets/sprite/ramk_Shapk/ramk_after2.png
+    - assets/sprite/ramk_Shapk/ramk_after3.png
+    - assets/sprite/ramk_Shapk/shapk.png
