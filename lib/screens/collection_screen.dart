@@ -388,6 +388,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                   Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Text(
+                                      (artifact.name == 'Найди настоящего махаона') ||
                                       (index == 0 && artifact.name == 'Самый крупный экспонат')
                                           ? artifact.name.split(' ').join('\n')
                                           : artifact.name,
