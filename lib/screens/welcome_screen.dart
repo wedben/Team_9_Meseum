@@ -11,6 +11,13 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/images/icon.png',
+                width: 120,
+                height: 120,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: 24),
               Text(
                 'Museum Quest',
                 textAlign: TextAlign.center,

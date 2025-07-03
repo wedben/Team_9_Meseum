@@ -11,6 +11,9 @@ import '../data/museum_stories.dart';
 
 import 'collection_screen.dart';
 import 'museum_history_screen.dart';
+import 'photo_quest_screen.dart';
+import 'text_input_quest_screen.dart';
+import 'qr_quest_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({Key? key}) : super(key: key);
@@ -44,21 +47,25 @@ class _MenuScreenState extends State<MenuScreen> {
         description: 'Узнайте всё о сыре и его истории.',
         history: MuseumStories.cheeseMuseumHistory,
         artifacts: MuseumQuests.cheeseMuseumQuests.map((q) => Artifact(
-          id: q['id']!,
-          name: q['name']!,
-          description: q['description']!,
+          id: q['id'] ?? '',
+          name: q['name'] ?? '',
+          description: q['description'] ?? '',
+          type: q['type'] ?? '',
+          answer: q['answer'] ?? '',
         )).toList(),
       ),
       Museum(
-        id: 'nature',
+        id: 'nature_museum',
         name: 'Музей природы',
         location: const LatLng(57.765759, 40.924066),
         description: 'Погрузитесь в природу и её разнообразие.',
         history: MuseumStories.natureMuseumHistory,
         artifacts: MuseumQuests.natureMuseumQuests.map((q) => Artifact(
-          id: q['id']!,
-          name: q['name']!,
-          description: q['description']!,
+          id: q['id'] ?? '',
+          name: q['name'] ?? '',
+          description: q['description'] ?? '',
+          type: q['type'] ?? '',
+          answer: q['answer'] ?? '',
         )).toList(),
       ),
       Museum(
@@ -68,9 +75,11 @@ class _MenuScreenState extends State<MenuScreen> {
         description: 'Откройте для себя военную историю региона.',
         history: MuseumStories.guardMuseumHistory,
         artifacts: MuseumQuests.guardMuseumQuests.map((q) => Artifact(
-          id: q['id']!,
-          name: q['name']!,
-          description: q['description']!,
+          id: q['id'] ?? '',
+          name: q['name'] ?? '',
+          description: q['description'] ?? '',
+          type: q['type'] ?? '',
+          answer: q['answer'] ?? '',
         )).toList(),
       ),
     ]);
@@ -114,30 +123,34 @@ class _MenuScreenState extends State<MenuScreen> {
 
     if (!visited) {
       await prefs.setBool('visited_${museum.id}', true);
-      Navigator.push(
+      await Navigator.push(
         context,
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => MuseumHistoryScreen(museum: museum),
-          transitionsBuilder: (_, animation, __, child) =>
-              FadeTransition(opacity: animation, child: child),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => CollectionScreen(museum: museum),
-          transitionsBuilder: (_, animation, __, child) =>
-              FadeTransition(opacity: animation, child: child),
-        ),
+        MaterialPageRoute(builder: (_) => MuseumHistoryScreen(museum: museum)),
       );
     }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CollectionScreen(museum: museum)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Карта музеев')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/icon.png',
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
+            ),
+            SizedBox(width: 8),
+            Text('Карта музеев'),
+          ],
+        ),
+      ),
       body: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
@@ -157,7 +170,37 @@ class _MenuScreenState extends State<MenuScreen> {
                 height: 40,
                 child: GestureDetector(
                   onTap: () => _onMuseumTap(museum),
-                  child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                  child: museum.id == 'nature_museum'
+                      ? Transform.scale(
+                          scale: 1.0, // подбери коэффициент для каждого маркера
+                          child: Image.asset(
+                            'assets/sprite/nature/natur_marker.png',
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.contain,
+                          ),
+                        )
+                      : museum.id == 'cheese'
+                          ? Transform.scale(
+                              scale: 4,
+                              child: Image.asset(
+                                'assets/sprite/cheese/cheese_marker.png',
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : museum.id == 'military'
+                              ? Transform.scale(
+                                  scale: 2.5,
+                                  child: Image.asset(
+                                    'assets/sprite/guard/guard_marker.png',
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.contain,
+                                  ),
+                                )
+                              : const Icon(Icons.location_on, color: Colors.red, size: 40),
                 ),
               );
             }).toList(),

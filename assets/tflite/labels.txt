@@ -1,0 +1,2 @@
+0 moose
+1 wolf

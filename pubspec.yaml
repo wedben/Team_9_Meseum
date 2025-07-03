@@ -9,21 +9,72 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # Карты и геолокация
   flutter_map: ^6.1.0
   latlong2: ^0.9.0
-  geolocator: ^10.1.0
+  geolocator: ^9.0.0
+  
+  # UI
   cupertino_icons: ^1.0.6
+  
+  # Хранение данных
   shared_preferences: ^2.2.2
   
+  # Компьютерное зрение
+  google_mlkit_image_labeling: ^0.14.1
+  google_mlkit_barcode_scanning: ^0.14.0
+  
+  # Работа с изображениями
+  image_picker: ^1.0.7
+  
+  # AR
+  vector_math: ^2.1.4
+  arkit_plugin: ^1.1.2
+  
+  # Дополнительные рекомендуемые пакеты
+  path_provider: ^2.0.11  # Для работы с путями файлов
+  path: ^1.8.2            # Для манипуляций с путями
+  
+  # Model Viewer Plus
+  model_viewer_plus: ^1.9.3
+  
+  # Permission Handler
+  permission_handler: ^11.0.0
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true
 
   assets:
-    - assets/models/
-    - assets/images/
-    - assets/sounds/
+    - assets/images/sled.png
+    - assets/images/icon.png
+    - assets/models/mammoth.glb
+    - assets/models/mammoth.dae
+    - assets/models/Image_0.png
+    - assets/models/roughness mammoth.png
+    - assets/models/mammoth.obj
+    - assets/sprite/nature/natur_marker.png
+    - assets/sprite/cheese/cheese_marker.png
+    - assets/sprite/guard/guard_marker.png
+    - assets/sprite/ramk_Shapk/ramk_do1.png
+    - assets/sprite/ramk_Shapk/ramk_do2.png
+    - assets/sprite/ramk_Shapk/ramk_do3.png
+    - assets/sprite/ramk_Shapk/ramk_after_reward.png
+    - assets/sprite/ramk_Shapk/ramk_after1.png
+    - assets/sprite/ramk_Shapk/ramk_after2.png
+    - assets/sprite/ramk_Shapk/ramk_after3.png
+    - assets/sprite/ramk_Shapk/shapk.png
