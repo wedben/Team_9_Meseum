@@ -311,17 +311,17 @@ class _CollectionScreenState extends State<CollectionScreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: GridView.builder(
-                    itemCount: itemCount,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                    ),
-                    itemBuilder: (context, index) {
-                      if (showRewardTile && index == itemCount - 1) {
-                        return GestureDetector(
-                          onTap: _openRewardThankYouScreen,
+        child: GridView.builder(
+          itemCount: itemCount,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
+          itemBuilder: (context, index) {
+            if (showRewardTile && index == itemCount - 1) {
+              return GestureDetector(
+                onTap: _openRewardThankYouScreen,
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
@@ -333,9 +333,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
                               ),
                               const Padding(
                                 padding: EdgeInsets.all(16.0),
-                                child: Text(
-                                  'Забрать награду',
-                                  textAlign: TextAlign.center,
+                    child: Text(
+                      'Забрать награду',
+                      textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.black,
@@ -351,65 +351,65 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                 ),
                               ),
                             ],
-                          ),
-                        );
-                      }
-                      final artifact = widget.museum.artifacts[index];
-                      final type = artifact.type;
-                      final answer = artifact.answer;
+                ),
+              );
+            }
+            final artifact = widget.museum.artifacts[index];
+            final type = artifact.type;
+            final answer = artifact.answer;
 
-                      return GestureDetector(
-                        onTap: () async {
-                          dynamic result;
-                          if (type == 'photo') {
-                            result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => PhotoQuestScreen(
-                                  targetLabel: answer,
-                                  description: artifact.description,
-                                  hint: artifact.description,
+            return GestureDetector(
+              onTap: () async {
+                dynamic result;
+                if (type == 'photo') {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PhotoQuestScreen(
+                        targetLabel: answer,
+                        description: artifact.description,
+                        hint: artifact.description,
                                   museumId: widget.museum.id == 'nature_museum' ? 'nature_museum' : null,
-                                ),
-                              ),
-                            );
-                          } else if (type == 'text') {
-                            result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TextInputQuestScreen(
-                                  question: artifact.description,
-                                  correctAnswer: answer,
+                      ),
+                    ),
+                  );
+                } else if (type == 'text') {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TextInputQuestScreen(
+                        question: artifact.description,
+                        correctAnswer: answer,
                                   museumId: widget.museum.id == 'nature_museum' ? 'nature_museum' : null,
-                                ),
-                              ),
-                            );
-                          } else if (type == 'qr') {
-                            result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
+                      ),
+                    ),
+                  );
+                } else if (type == 'qr') {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
                                 builder: (_) => QrQuestScreen(
                                   description: artifact.description,
                                   museumId: widget.museum.id == 'nature_museum' ? 'nature_museum' : null,
                                 ),
-                              ),
-                            );
-                          } else {
-                            result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TaskScreen(
-                                  artifactName: artifact.name,
-                                  artifactDescription: artifact.description,
-                                  description: artifact.description,
+                    ),
+                  );
+                } else {
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TaskScreen(
+                        artifactName: artifact.name,
+                        artifactDescription: artifact.description,
+                        description: artifact.description,
                                   museumId: widget.museum.id == 'nature_museum' ? 'nature_museum' : null,
-                                ),
-                              ),
-                            );
-                          }
+                      ),
+                    ),
+                  );
+                }
 
-                          if (result == true) markAsFound(index);
-                        },
+                if (result == true) markAsFound(index);
+              },
                         child: widget.museum.id == 'nature_museum'
                             ? Stack(
                                 alignment: Alignment.center,
@@ -455,24 +455,24 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                 ],
                               )
                             : Container(
-                                decoration: BoxDecoration(
-                                  color: artifact.found ? Colors.amber : Colors.grey[400],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    artifact.name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: artifact.found ? Colors.black : Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                      );
-                    },
+                decoration: BoxDecoration(
+                  color: artifact.found ? Colors.amber : Colors.grey[400],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    artifact.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: artifact.found ? Colors.black : Colors.white,
+                    ),
                   ),
+                ),
+              ),
+            );
+          },
+        ),
                 ),
               ),
             ],
@@ -535,39 +535,39 @@ class RewardThankYouScreen extends StatelessWidget {
                 ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Спасибо за прохождение нашего квеста!\nВы отлично справились!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 40),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          if (Platform.isIOS) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ARRewardIosScreen()),
-                            );
-                          } else if (Platform.isAndroid) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ARRewardAndroidScreen()),
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.card_giftcard),
-                        label: const Text('Забрать награду'),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(48),
-                        ),
-                      ),
-                    ],
-                  ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'Спасибо за прохождение нашего квеста!\nВы отлично справились!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 40),
+            ElevatedButton.icon(
+              onPressed: () {
+                if (Platform.isIOS) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ARRewardIosScreen()),
+                  );
+                } else if (Platform.isAndroid) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ARRewardAndroidScreen()),
+                  );
+                }
+              },
+              icon: const Icon(Icons.card_giftcard),
+              label: const Text('Забрать награду'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+              ),
+            ),
+          ],
+        ),
                 ),
               ),
             ],
